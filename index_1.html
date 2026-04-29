@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#080c14">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TechNova">
+<title>TechNova · Sistema Financiero</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080c14;--bg2:#0d1420;--bg3:#111827;--border:#1e2d45;
+  --accent:#00e5ff;--accent2:#7b61ff;--green:#00f5a0;
+  --red:#ff4560;--yellow:#ffd166;--text:#e8edf5;--muted:#4a5a72;--card:#0d1420;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:72px;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:18px 28px;border-bottom:1px solid var(--border);background:var(--bg2);position:sticky;top:0;z-index:100;}
+.logo{font-family:'Space Mono',monospace;font-size:16px;font-weight:700;color:var(--accent);letter-spacing:2px;display:flex;align-items:center;gap:10px;}
+.logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,229,255,0.4);}50%{box-shadow:0 0 0 8px rgba(0,229,255,0);}}
+.nav-desktop{display:flex;gap:4px;background:var(--bg3);padding:4px;border-radius:12px;border:1px solid var(--border);}
+.nav-desktop button{background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:8px 18px;border-radius:8px;cursor:pointer;transition:all 0.2s;}
+.nav-desktop button:hover{color:var(--text);background:rgba(255,255,255,0.05);}
+.nav-desktop button.active{background:var(--accent);color:#000;font-weight:600;}
+.nav-mobile{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);padding:6px 8px;z-index:200;gap:4px;}
+.nav-mobile button{flex:1;background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;padding:10px 6px;border-radius:10px;cursor:pointer;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:3px;}
+.nav-mobile button .nav-icon{font-size:18px;}
+.nav-mobile button.active{color:var(--accent);background:rgba(0,229,255,0.08);}
+.vista{display:none;}.vista.activa{display:block;}
+.dashboard{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:24px 28px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px 22px;position:relative;overflow:hidden;transition:border-color 0.3s;}
+.kpi:hover{border-color:var(--accent);}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.kpi-label{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;}
+.kpi-value{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--text);}
+.kpi-icon{position:absolute;right:16px;top:16px;font-size:22px;opacity:0.15;}
+.tabla-wrap{padding:0 28px 28px;}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;}
+.tab-bar{display:flex;border-bottom:1px solid var(--border);}
+.tab-btn{background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:14px 20px;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;margin-bottom:-1px;}
+.tab-btn:hover{color:var(--text);}.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-content{display:none;padding:16px 20px;}.tab-content.active{display:block;}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;max-height:400px;overflow-y:auto;}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:700px;}
+thead{position:sticky;top:0;z-index:2;}
+th{background:var(--bg);color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;padding:10px 12px;text-align:left;white-space:nowrap;border-bottom:1px solid var(--border);}
+td{padding:10px 12px;border-bottom:1px solid rgba(30,45,69,0.5);white-space:nowrap;}
+tr:hover td{background:rgba(255,255,255,0.02);}
+.table-actions{display:flex;justify-content:flex-end;margin-bottom:12px;}
+.ops-grid{display:grid;grid-template-columns:380px 1fr;gap:20px;padding:24px 28px;align-items:start;}
+.panel-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+.panel-header h2{font-size:14px;font-weight:600;color:var(--text);}
+.panel-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);}
+.panel-body{padding:20px 22px;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;}
+input,select{width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border-color 0.2s;-webkit-appearance:none;}
+input:focus,select:focus{border-color:var(--accent);}
+input::placeholder{color:var(--muted);}
+select option{background:var(--bg3);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#0099cc);border:none;color:#000;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;border-radius:10px;cursor:pointer;letter-spacing:0.5px;transition:all 0.2s;margin-top:6px;}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,229,255,0.25);}
+.btn-green{background:linear-gradient(135deg,var(--green),#00a86b);color:#000;}
+.btn-green:hover{box-shadow:0 6px 20px rgba(0,245,160,0.25);}
+.btn-refresh{padding:8px 16px;font-size:12px;border-radius:8px;width:auto;background:var(--bg3);color:var(--muted);border:1px solid var(--border);font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all 0.2s;}
+.btn-refresh:hover{border-color:var(--accent);color:var(--accent);}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+.badge-activo{background:rgba(0,245,160,0.12);color:var(--green);}
+.badge-vencido{background:rgba(255,69,96,0.12);color:var(--red);}
+.badge-cancelado{background:rgba(123,97,255,0.12);color:var(--accent2);}
+.badge-aldia{background:rgba(0,245,160,0.08);color:var(--green);}
+.badge-mora{background:rgba(255,209,102,0.12);color:var(--yellow);}
+.badge-interes{background:rgba(0,229,255,0.08);color:var(--accent);}
+.badge-capital{background:rgba(123,97,255,0.08);color:var(--accent2);}
+.fila-vencida td{background:rgba(255,69,96,0.04);}
+.mono{font-family:'Space Mono',monospace;font-size:12px;}
+.toast{position:fixed;bottom:85px;right:20px;background:var(--bg2);border:1px solid var(--accent);color:var(--accent);padding:12px 20px;border-radius:12px;font-size:13px;font-weight:500;z-index:999;transform:translateY(20px);opacity:0;transition:all 0.3s;box-shadow:0 8px 30px rgba(0,229,255,0.15);max-width:320px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.error{border-color:var(--red);color:var(--red);box-shadow:0 8px 30px rgba(255,69,96,0.15);}
+.loader{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--muted);font-size:13px;gap:10px;}
+.spinner{width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.empty{text-align:center;padding:40px;color:var(--muted);font-size:13px;}
+@media(max-width:768px){
+  .header{padding:12px 16px;}
+  .nav-desktop{display:none;}
+  .nav-mobile{display:flex;}
+  .dashboard{grid-template-columns:1fr 1fr;padding:16px;gap:12px;}
+  .kpi{padding:14px 16px;}.kpi-value{font-size:17px;}.kpi-label{font-size:10px;}
+  .tabla-wrap{padding:0 16px 16px;}
+  .ops-grid{grid-template-columns:1fr;padding:16px;gap:16px;}
+  .row2{grid-template-columns:1fr;}
+  input,select{font-size:16px;}
+  .tab-btn{font-size:12px;padding:12px;}
+  .toast{bottom:80px;right:12px;left:12px;max-width:none;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo"><div class="logo-dot"></div>TECHNOVA · FINANZAS</div>
+  <div class="nav-desktop">
+    <button class="active" onclick="setVista('dashboard',this)">Dashboard</button>
+    <button onclick="setVista('operaciones',this)">Operaciones</button>
+  </div>
+</div>
+
+<div id="vista-dashboard" class="vista activa">
+  <div class="dashboard">
+    <div class="kpi"><div class="kpi-icon">💼</div><div class="kpi-label">Total prestado</div><div class="kpi-value" id="kpiTotal">—</div></div>
+    <div class="kpi"><div class="kpi-icon">⚡</div><div class="kpi-label">Activos</div><div class="kpi-value" id="kpiActivos">—</div></div>
+    <div class="kpi"><div class="kpi-icon">⚠️</div><div class="kpi-label">Vencidos</div><div class="kpi-value" id="kpiVencidos">—</div></div>
+    <div class="kpi"><div class="kpi-icon">✅</div><div class="kpi-label">Cancelados</div><div class="kpi-value" id="kpiCancelados">—</div></div>
+  </div>
+  <div class="tabla-wrap">
+    <div class="panel">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="setTab(this,'tab-prestamos')">Historial de Préstamos</button>
+        <button class="tab-btn" onclick="setTab(this,'tab-pagos')">Historial de Pagos</button>
+      </div>
+      <div id="tab-prestamos" class="tab-content active">
+        <div class="table-actions"><button class="btn-refresh" onclick="cargarTodo()">↻ Actualizar</button></div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Cédula</th><th>Cliente</th><th>Teléfono</th><th>Dirección</th><th>Préstamo</th><th>Interés</th><th>Int. Mensual</th><th>F. Préstamo</th><th>F. Vencimiento</th><th>Estado</th><th>Estado Interés</th></tr></thead>
+            <tbody id="tbPrestamos"><tr><td colspan="11"><div class="loader"><div class="spinner"></div> Cargando...</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div id="tab-pagos" class="tab-content">
+        <div class="table-actions"><button class="btn-refresh" onclick="cargarTodo()">↻ Actualizar</button></div>
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Cédula</th><th>Cliente</th><th>Tipo</th><th>Monto</th><th>Fecha</th></tr></thead>
+            <tbody id="tbPagos"><tr><td colspan="5"><div class="loader"><div class="spinner"></div> Cargando...</div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="vista-operaciones" class="vista">
+  <div class="ops-grid">
+    <div class="panel">
+      <div class="panel-header"><div class="panel-dot"></div><h2>Registrar Préstamo</h2></div>
+      <div class="panel-body">
+        <div class="field"><label>Cédula</label><input id="cedula" placeholder="Ej: 1234567890"></div>
+        <div class="field"><label>Cliente</label><input id="cliente" placeholder="Nombre completo"></div>
+        <div class="row2">
+          <div class="field"><label>Teléfono</label><input id="telefono" placeholder="3001234567"></div>
+          <div class="field"><label>Interés %</label><input id="interes" type="number" placeholder="10"></div>
+        </div>
+        <div class="field"><label>Dirección</label><input id="direccion" placeholder="Barrio, ciudad"></div>
+        <div class="field"><label>Valor del préstamo</label><input id="prestamo" placeholder="$ 0" oninput="formatMoneda(this)"></div>
+        <div class="row2">
+          <div class="field"><label>Fecha préstamo</label><input type="date" id="fechaPrestamo"></div>
+          <div class="field"><label>Fecha vencimiento</label><input type="date" id="fechaVencimiento"></div>
+        </div>
+        <button class="btn" onclick="guardarPrestamo()">Guardar préstamo</button>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header"><div class="panel-dot" style="background:var(--green)"></div><h2>Registrar Pago</h2></div>
+      <div class="panel-body">
+        <div class="row2">
+          <div class="field"><label>Cédula</label><input id="cedulaPago" placeholder="Buscar..." oninput="buscarCliente()"></div>
+          <div class="field"><label>Cliente</label><input id="clientePago" placeholder="Auto-completa" readonly></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Tipo de pago</label><select id="tipoPago"><option value="interes">Interés</option><option value="capital">Capital</option></select></div>
+          <div class="field"><label>Monto</label><input id="montoPago" placeholder="$ 0" oninput="formatMoneda(this)"></div>
+        </div>
+        <button class="btn btn-green" onclick="guardarPago()" style="margin-top:12px;">Registrar pago</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="nav-mobile">
+  <button class="active" onclick="setVistaMobile('dashboard',this)"><span class="nav-icon">📊</span>Dashboard</button>
+  <button onclick="setVistaMobile('operaciones',this)"><span class="nav-icon">💼</span>Operaciones</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, updateDoc, doc, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAq0DFmBzgnTV84nqaJTey_3_Ben1xNwBg",
+  authDomain: "technova-finanzas.firebaseapp.com",
+  projectId: "technova-finanzas",
+  storageBucket: "technova-finanzas.firebasestorage.app",
+  messagingSenderId: "800284461033",
+  appId: "1:800284461033:web:adf3c698cebc3123666d78"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+let PAGOS = [], PRESTAMOS = [];
+
+window.formatMoneda = function(input){
+  let v = input.value.replace(/\D/g,'');
+  let n = Number(v);
+  input.value = n ? '$ ' + n.toLocaleString('es-CO') : '';
+};
+
+function toast(msg, error=false){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (error?' error':'');
+  setTimeout(()=>t.className='toast', 3500);
+}
+
+function fmtMoneda(n){ return '$ ' + Number(n).toLocaleString('es-CO'); }
+
+function fmtFecha(ts){
+  if(!ts) return '';
+  let d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('es-CO');
+}
+
+window.setVista = function(id, btn){
+  document.querySelectorAll('.vista').forEach(v=>v.classList.remove('activa'));
+  document.getElementById('vista-'+id).classList.add('activa');
+  document.querySelectorAll('.nav-desktop button').forEach(b=>b.classList.remove('active'));
+  if(btn) btn.classList.add('active');
+};
+
+window.setVistaMobile = function(id, btn){
+  setVista(id, null);
+  document.querySelectorAll('.nav-mobile button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+};
+
+window.setTab = function(btn, tabId){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+};
+
+window.buscarCliente = function(){
+  let cedula = document.getElementById('cedulaPago').value.trim();
+  let match = PRESTAMOS.find(p=>p.cedula==cedula && p.estado!='Cancelado');
+  document.getElementById('clientePago').value = match ? match.cliente : '';
+};
+
+window.guardarPrestamo = async function(){
+  let cedula = document.getElementById('cedula').value.trim();
+  let cliente = document.getElementById('cliente').value.trim();
+  let telefono = document.getElementById('telefono').value.trim();
+  let direccion = document.getElementById('direccion').value.trim();
+  let prestamo = Number(document.getElementById('prestamo').value.replace(/\D/g,''));
+  let interes = Number(document.getElementById('interes').value);
+  let fechaPrestamo = document.getElementById('fechaPrestamo').value;
+  let fechaVencimiento = document.getElementById('fechaVencimiento').value;
+
+  if(!cedula||!cliente||!prestamo||!fechaPrestamo||!fechaVencimiento){
+    toast('⚠️ Completa todos los campos obligatorios', true); return;
+  }
+
+  try{
+    await addDoc(collection(db,'prestamos'),{
+      cedula, cliente, telefono, direccion, prestamo, interes,
+      fechaPrestamo: Timestamp.fromDate(new Date(fechaPrestamo+'T12:00:00')),
+      fechaVencimiento: Timestamp.fromDate(new Date(fechaVencimiento+'T12:00:00')),
+      estado: 'Activo',
+      creadoEn: Timestamp.now()
+    });
+    toast('✅ Préstamo guardado exitosamente');
+    ['cedula','cliente','telefono','direccion','prestamo','interes','fechaPrestamo','fechaVencimiento']
+      .forEach(id=>document.getElementById(id).value='');
+    cargarTodo();
+  } catch(e){ toast('❌ Error: '+e.message, true); }
+};
+
+window.guardarPago = async function(){
+  let cedula = document.getElementById('cedulaPago').value.trim();
+  let cliente = document.getElementById('clientePago').value.trim();
+  let tipo = document.getElementById('tipoPago').value;
+  let monto = Number(document.getElementById('montoPago').value.replace(/\D/g,''));
+
+  if(!cedula||!monto){ toast('⚠️ Completa todos los campos', true); return; }
+
+  try{
+    let prestamo = PRESTAMOS.find(p=>p.cedula==cedula && p.estado!='Cancelado');
+    if(!prestamo){ toast('⚠️ No se encontró préstamo activo para esta cédula', true); return; }
+
+    await addDoc(collection(db,'pagos'),{
+      cedula, cliente, tipo, monto, fecha: Timestamp.now()
+    });
+
+    if(tipo=='capital'){
+      let pagosCap = PAGOS.filter(p=>p.cedula==cedula && p.tipo=='capital');
+      let totalCap = pagosCap.reduce((s,p)=>s+p.monto,0) + monto;
+      if(totalCap >= prestamo.prestamo){
+        await updateDoc(doc(db,'prestamos',prestamo.id),{estado:'Cancelado'});
+        toast('✅ Préstamo CANCELADO exitosamente 🎉');
+      } else {
+        toast('✅ Abono a capital registrado');
+      }
+    } else {
+      toast('✅ Pago de interés registrado');
+    }
+
+    document.getElementById('cedulaPago').value='';
+    document.getElementById('clientePago').value='';
+    document.getElementById('montoPago').value='';
+    cargarTodo();
+  } catch(e){ toast('❌ Error: '+e.message, true); }
+};
+
+window.cargarTodo = async function(){
+  await Promise.all([cargarPagos(), cargarPrestamos()]);
+};
+
+async function cargarPagos(){
+  let snap = await getDocs(query(collection(db,'pagos'), orderBy('fecha','desc')));
+  PAGOS = snap.docs.map(d=>({id:d.id,...d.data()}));
+  let tbody = document.getElementById('tbPagos');
+  tbody.innerHTML='';
+  if(!PAGOS.length){ tbody.innerHTML='<tr><td colspan="5"><div class="empty">Sin pagos registrados</div></td></tr>'; return; }
+  PAGOS.forEach(p=>{
+    tbody.innerHTML+=`<tr>
+      <td class="mono">${p.cedula}</td><td>${p.cliente}</td>
+      <td><span class="badge ${p.tipo=='interes'?'badge-interes':'badge-capital'}">${p.tipo}</span></td>
+      <td class="mono">${fmtMoneda(p.monto)}</td><td>${fmtFecha(p.fecha)}</td>
+    </tr>`;
+  });
+}
+
+async function cargarPrestamos(){
+  let snap = await getDocs(query(collection(db,'prestamos'), orderBy('creadoEn','desc')));
+  PRESTAMOS = snap.docs.map(d=>({id:d.id,...d.data()}));
+  let tbody = document.getElementById('tbPrestamos');
+  tbody.innerHTML='';
+  let totalPrestado=0, activos=0, vencidos=0, cancelados=0;
+  let hoy = new Date(); hoy.setHours(0,0,0,0);
+
+  if(!PRESTAMOS.length){
+    tbody.innerHTML='<tr><td colspan="11"><div class="empty">Sin préstamos registrados</div></td></tr>';
+    actualizarKPIs(0,0,0,0); return;
+  }
+
+  PRESTAMOS.forEach(p=>{
+    let vencimiento = p.fechaVencimiento.toDate(); vencimiento.setHours(0,0,0,0);
+    let estado = p.estado, clase = '';
+    if(estado=='Cancelado') cancelados++;
+    else if(vencimiento<hoy){ estado='Vencido'; clase='fila-vencida'; vencidos++; }
+    else activos++;
+
+    let estadoInteres = '';
+    if(estado!='Cancelado'){
+      let ultimoPagoInt = PAGOS
+        .filter(pg=>pg.cedula==p.cedula && pg.tipo=='interes')
+        .sort((a,b)=>b.fecha.toMillis()-a.fecha.toMillis())[0];
+      let fechaBase = ultimoPagoInt ? ultimoPagoInt.fecha.toDate() : p.fechaPrestamo.toDate();
+      fechaBase.setHours(0,0,0,0);
+      let diff = (hoy-fechaBase)/(1000*60*60*24);
+      estadoInteres = diff>30 ? 'mora' : 'aldia';
+    }
+
+    if(estado!='Cancelado') totalPrestado += p.prestamo;
+    let intMensual = p.prestamo*(p.interes/100);
+
+    let badgeEstado =
+      estado=='Activo' ? '<span class="badge badge-activo">● Activo</span>' :
+      estado=='Vencido' ? '<span class="badge badge-vencido">● Vencido</span>' :
+      '<span class="badge badge-cancelado">● Cancelado</span>';
+
+    let badgeInteres = estadoInteres=='' ? '' :
+      estadoInteres=='aldia' ? '<span class="badge badge-aldia">✓ Al día</span>' :
+      '<span class="badge badge-mora">⚠ Debe intereses</span>';
+
+    tbody.innerHTML+=`<tr class="${clase}">
+      <td class="mono">${p.cedula}</td><td>${p.cliente}</td>
+      <td>${p.telefono||''}</td><td>${p.direccion||''}</td>
+      <td class="mono">${fmtMoneda(p.prestamo)}</td>
+      <td class="mono">${p.interes}%</td>
+      <td class="mono">${fmtMoneda(intMensual)}</td>
+      <td>${fmtFecha(p.fechaPrestamo)}</td>
+      <td>${fmtFecha(p.fechaVencimiento)}</td>
+      <td>${badgeEstado}</td><td>${badgeInteres}</td>
+    </tr>`;
+  });
+  actualizarKPIs(totalPrestado, activos, vencidos, cancelados);
+}
+
+function actualizarKPIs(total, activos, vencidos, cancelados){
+  document.getElementById('kpiTotal').textContent = fmtMoneda(total);
+  document.getElementById('kpiActivos').textContent = activos;
+  document.getElementById('kpiVencidos').textContent = vencidos;
+  document.getElementById('kpiCancelados').textContent = cancelados;
+}
+
+cargarTodo();
+</script>
+</body>
+</html>
